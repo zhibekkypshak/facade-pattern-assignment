@@ -1,13 +1,28 @@
+
 package subsystem;
 
 public class NotificationService {
 
     public void sendConfirmation(String product) {
-        System.out.println("Notification: Your order for " + product + " has been confirmed.");
+        System.out.println(
+                "Notification: Your order for " + product
+                        + " has been confirmed."
+        );
     }
 
     public void sendFailure(String product) {
-        System.out.println("Notification: Your order for " + product + " has failed.");
+        System.out.println(
+                "Notification: Your order for " + product
+                        + " has failed."
+        );
+    }
+
+    public void sendCancellation(String product) {
+        System.out.println(
+                "Notification: Your order for " + product
+                        + " has been cancelled."
+        );
     }
 }
+
 
