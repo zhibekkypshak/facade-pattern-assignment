@@ -1,4 +1,30 @@
-package PACKAGE_NAME;
-
 public class OrderFacade {
+    private final InventoryService inventoryService;
+    private final PaymentProcessor paymentProcessor;
+    private final ShippingService shippingService;
+    private final NotificationService notificationService;
+
+    public OrderFacade(){
+        inventoryService = new InventoryService();
+        paymentProcessor = new PaymentProcessor();
+        shippingService = new ShippingService();
+        notificationService = new NotificationService();
+    }
+    public void placeOrder(String product, int quantity, double amount){
+        System.out.println("\n Starting Order Process ");
+        if (!inventoryService.checkStock(product, quantity)){
+            notificationService.sendFailure(product);
+            return;
+        }
+        if (!paymentProcessor.processPayment(amount)){
+            inventoryService.releaseStock(product, quantity);
+            notificationService.sendFailure(product);
+            return;
+        }
+
+        shippingService.arrangeShipping(product,quantity);
+        notificationService.sendConfirmation(product);
+
+        System.out.println("Order Completed Succesfully");
+    }
 }
