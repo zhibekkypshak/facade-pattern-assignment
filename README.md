@@ -11,13 +11,13 @@ The system processes online orders by coordinating inventory management, payment
 - Java 17
 - IntelliJ IDEA
 - Git and GitHub
-- PlantUML
 
 ## Project Structure
 
 ```text
 src/
-├── Main.java
+├── client/
+│   └── Main.java
 ├── facade/
 │   └── OrderFacade.java
 └── subsystem/
@@ -31,8 +31,22 @@ src/
 
 1. Open the project in IntelliJ IDEA.
 2. Make sure JDK 17 is configured.
-3. Open `src/Main.java`.
+3. Open `src/client/Main.java`.
 4. Run the `main()` method.
+
+Or from the command line, from the project root:
+
+```bash
+javac -d out $(find src -name "*.java")
+java -cp out client.Main
+```
+
+## Public API of the Facade
+
+- `placeOrder(String product, int quantity, double amount)`
+- `cancelOrder(String product, int quantity, double amount)`
+
+The client never calls subsystem classes directly.
 
 ## How It Works
 
@@ -44,25 +58,34 @@ The client calls `OrderFacade.placeOrder()`. The facade coordinates the subsyste
 4. Arrange shipping.
 5. Send an order confirmation.
 
-If the stock is insufficient or payment fails, the order is stopped and a failure notification is sent. If payment fails after stock reservation, the reserved items are returned to inventory.
+If any step fails, the facade rolls back the previous steps:
+
+- if payment fails → reserved stock is released;
+- if shipping fails → payment is refunded and reserved stock is released;
+- the customer receives a failure notification.
+
+`cancelOrder()` rolls back an already placed order: releases stock, refunds the payment and sends a cancellation notification.
 
 ## Design Pattern Roles
 
 - **Facade:** `OrderFacade`
 - **Client:** `Main`
-- **Subsystem classes:** `InventoryService`, `PaymentProcessor`, `ShippingService`, and `NotificationService`
+- **Subsystem classes:** `InventoryService`, `PaymentProcessor`, `ShippingService`, `NotificationService`
 
-The Facade hides the coordination details of the subsystem from the client.
+Subsystem classes have no reference to the Facade and can still be used directly by advanced clients.
 
 ## Test Scenarios
 
-- Successful order.
-- Insufficient stock.
-- Invalid payment amount.
-- Invalid product quantity.
-- Stock rollback after payment failure.
+Covered in `Main`:
+
+1. Successful order.
+2. Order cancellation.
+3. Insufficient stock.
+4. Invalid payment amount → stock rollback.
+5. Invalid product quantity.
+6. Successful order again, to prove the system state is consistent after rollbacks.
 
 ## UML Diagram
 
-The UML class diagram represents the relationships between `Main`, `OrderFacade`, and the subsystem classes.
+ It shows the relationships between `Main`, `OrderFacade`, and the four subsystem classes.
 
