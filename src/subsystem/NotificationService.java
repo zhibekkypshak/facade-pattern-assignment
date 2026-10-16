@@ -1,3 +1,5 @@
+package subsystem;
+
 public class NotificationService {
 
     public void sendConfirmation(String product) {
