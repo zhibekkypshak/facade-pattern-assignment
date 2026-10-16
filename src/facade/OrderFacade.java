@@ -20,7 +20,7 @@ public class OrderFacade {
     }
 
     public void placeOrder(String product, int quantity, double amount) {
-        System.out.println("\n--- Starting Order Process ---");
+        System.out.println("\n   Starting Order Process    ");
 
         if (!inventoryService.checkStock(product, quantity)) {
             notificationService.sendFailure(product);
@@ -39,6 +39,6 @@ public class OrderFacade {
 
         notificationService.sendConfirmation(product);
 
-        System.out.println("--- Order Completed Successfully ---");
+        System.out.println("    Order Completed Successfully    ");
     }
 }
