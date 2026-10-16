@@ -20,11 +20,11 @@ public class OrderFacade {
     }
 
     public void placeOrder(String product, int quantity, double amount) {
-        System.out.println("=== Starting Order Process ===");
+        System.out.println("Starting Order Process");
 
         if (!inventoryService.checkStock(product, quantity)) {
             notificationService.sendFailure(product);
-            System.out.println("=== Order Failed ===");
+            System.out.println("Order Failed");
             return;
         }
 
@@ -33,7 +33,7 @@ public class OrderFacade {
         if (!paymentProcessor.processPayment(amount)) {
             inventoryService.releaseStock(product, quantity);
             notificationService.sendFailure(product);
-            System.out.println("=== Order Failed ===");
+            System.out.println("Order Failed");
             return;
         }
 
@@ -41,11 +41,21 @@ public class OrderFacade {
             paymentProcessor.refundPayment(amount);
             inventoryService.releaseStock(product, quantity);
             notificationService.sendFailure(product);
-            System.out.println("=== Order Failed ===");
+            System.out.println("Order Failed");
             return;
         }
 
         notificationService.sendConfirmation(product);
-        System.out.println("=== Order Completed Successfully ===");
+        System.out.println("Order Completed Successfully");
+    }
+
+    public void cancelOrder(String product, int quantity, double amount) {
+        System.out.println("Cancelling Order");
+
+        inventoryService.releaseStock(product, quantity);
+        paymentProcessor.refundPayment(amount);
+        notificationService.sendCancellation(product);
+
+        System.out.println("Order Cancelled");
     }
 }
